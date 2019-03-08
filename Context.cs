@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-namespace LP2_FINAL
+namespace LP2_FINAL.models
 {
     public class Context: DbContext
     {

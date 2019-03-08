@@ -1,4 +1,4 @@
-namespace LP2_FINAL
+namespace LP2_FINAL.models
 {
     public class Produto
     {
