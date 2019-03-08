@@ -1,4 +1,4 @@
-namespace LP2_FINAL.models
+namespace MercadoApi.Models
 {
 
     public class Funcionario
@@ -6,7 +6,7 @@ namespace LP2_FINAL.models
         public int Id{get;set;}
         public string Nome{get;set;}
         public string Cpf{get;set;}
-        public char Sexo{get;set;}
+        public string Sexo{get;set;}
         public string Turno{get;set;}
         public double Salario{get;set;}
 

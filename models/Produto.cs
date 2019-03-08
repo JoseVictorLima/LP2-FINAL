@@ -1,4 +1,4 @@
-namespace LP2_FINAL.models
+namespace MercadoApi.Models
 {
     public class Produto
     {

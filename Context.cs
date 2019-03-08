@@ -1,8 +1,12 @@
 using Microsoft.EntityFrameworkCore;
-namespace LP2_FINAL.models
+namespace MercadoApi.Models
 {
     public class Context: DbContext
     {
+        public Context(DbContextOptions<Context> options)         
+            :base(options)         
+        {   
+        }
         public DbSet<Funcionario> Funcionarios {get; set;}  
         public DbSet<Gerente> Gerentes {get; set;}   
         public DbSet<Operador> Operadores {get; set;}
@@ -10,9 +14,10 @@ namespace LP2_FINAL.models
         public DbSet<Estoque> Estoques {get; set;}
         public DbSet<Caixa> Caixas {get; set;}
         public DbSet<Relatorio> Relatorios {get; set;}
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)         
-        {   
-            optionsBuilder.UseSqlite("Data Source=SuperMercadoDataBase.db");         
-        }
+        {             optionsBuilder.UseSqlite("Data Source=SuperMercadoDataBase.db");         
+        }    
+        
     }
 }

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace LP2_FINAL.models
+namespace MercadoApi.Models
 {
     public class Estoque
     {
