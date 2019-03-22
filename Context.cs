@@ -14,6 +14,7 @@ namespace MercadoApi.Models
         public DbSet<Estoque> Estoques {get; set;}
         public DbSet<Caixa> Caixas {get; set;}
         public DbSet<Relatorio> Relatorios {get; set;}
+        public DbSet<Produto> Produtos {get; set;}
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)         
         {             optionsBuilder.UseSqlite("Data Source=SuperMercadoDataBase.db");         

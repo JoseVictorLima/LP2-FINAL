@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,59 +7,59 @@ using MercadoApi.Models;
 
 namespace MercadoApi.Controllers
 {
-    [Route("mercado/funcionarios")]
+    [Route("mercado/gerentes")]
     [ApiController]
-    public class FuncionarioController : ControllerBase
+    public class GerenteController : ControllerBase
     {
         private readonly Context _context;
 
-        public FuncionarioController(Context context)
+        public GerenteController(Context context)
         {
             _context = context;
             
-            if (_context.Funcionarios.Count() == 0)
+            if (_context.Gerentes.Count() == 0)
             {
                 // Create a new TodoItem if collection is empty,
                 // which means you can't delete all TodoItems.
-                _context.Funcionarios.Add(new Funcionario { Nome = "Victor", Cpf = "12345",Sexo = "M", Turno = "Tarde", Salario =  10.50});
+                _context.Gerentes.Add(new Gerente {Funcionario = new Funcionario{Nome = "Gerente", Cpf = "1",Sexo = "M", Turno = "Manhã,Tarde,Noite", Salario =  5000.00}});
                 _context.SaveChanges();
             }
         }
 
     // GET: 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Funcionario>>> GetFuncionarios()
+    public async Task<ActionResult<IEnumerable<Gerente>>> GetGerentes()
     {
-        return await _context.Funcionarios.ToListAsync();
+        return await _context.Gerentes.ToListAsync();
     }
 
     // GET with id: 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Funcionario>> GetFuncionarios(int id)
+    public async Task<ActionResult<Gerente>> GetGerentes(int id)
     {
-        var funcionario = await _context.Funcionarios.FindAsync(id);
+        var gerente = await _context.Gerentes.FindAsync(id);
 
-        if (funcionario == null)
+        if (gerente == null)
         {
             return NotFound();
         }
 
-        return funcionario;
+        return gerente;
     }
 
     // POST: 
     [HttpPost]
-    public async Task<ActionResult<Funcionario>> PostFuncionarios(Funcionario item)
+    public async Task<ActionResult<Gerente>> PostGerentes(Gerente item)
     {
-        _context.Funcionarios.Add(item);
+        _context.Gerentes.Add(item);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetFuncionarios), new { id = item.Id }, item);
+        return CreatedAtAction(nameof(GetGerentes), new { id = item.Id }, item);
     }
 
     // PUT: 
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutFuncionarios(long id, Funcionario item)
+    public async Task<IActionResult> PutGerentes(long id, Gerente item)
     {
         if (id != item.Id)
         {
@@ -76,14 +76,14 @@ namespace MercadoApi.Controllers
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteTodoItem(int id)
     {
-        var funcionario = await _context.Funcionarios.FindAsync(id);
+        var gerente = await _context.Gerentes.FindAsync(id);
 
-        if (funcionario == null)
+        if (gerente == null)
         {
             return NotFound();
         }
 
-        _context.Funcionarios.Remove(funcionario);
+        _context.Gerentes.Remove(gerente);
         await _context.SaveChangesAsync();
 
         return NoContent();
