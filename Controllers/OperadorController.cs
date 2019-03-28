@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -28,23 +29,40 @@ namespace MercadoApi.Controllers
 
     // GET: 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Operador>>> GetOperadores()
+    public async Task<ActionResult<IEnumerable<Object>>> GetOperadores()
     {
-        return await _context.Operadores.ToListAsync();
+        var operadorList = await _context.Operadores.ToListAsync();
+        Object[] newOperadorList = new Object[operadorList.Count];
+        int i = 0;
+        foreach(var operador in operadorList){
+            var funcionario = await _context.Funcionarios.FindAsync(operador.FuncionarioId);
+            var json = new{
+                id = operador.Id,
+                funcionario =  funcionario
+            };
+            System.Diagnostics.Debug.WriteLine(json);
+            newOperadorList[i] = json;
+            i++;
+        }
+       
+        return  newOperadorList.ToList();
     }
 
     // GET with id: 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Operador>> GetOperadores(int id)
+    public async Task<ActionResult<Object>> GetOperadores(int id)
     {
-        var gerente = await _context.Operadores.FindAsync(id);
-
-        if (gerente == null)
+        var operador = await _context.Operadores.FindAsync(id);
+        var funcionario = await _context.Funcionarios.FindAsync(operador.FuncionarioId);
+        if (operador == null)
         {
             return NotFound();
         }
-
-        return gerente;
+        var operadorFormatado = new {
+            id = operador.Id,
+            funcionario = funcionario
+        };
+        return operadorFormatado;
     }
 
     // POST: 
@@ -76,14 +94,14 @@ namespace MercadoApi.Controllers
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteTodoItem(int id)
     {
-        var gerente = await _context.Operadores.FindAsync(id);
+        var operador = await _context.Operadores.FindAsync(id);
 
-        if (gerente == null)
+        if (operador == null)
         {
             return NotFound();
         }
 
-        _context.Operadores.Remove(gerente);
+        _context.Operadores.Remove(operador);
         await _context.SaveChangesAsync();
 
         return NoContent();

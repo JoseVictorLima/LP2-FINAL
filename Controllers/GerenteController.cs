@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -21,30 +22,49 @@ namespace MercadoApi.Controllers
             {
                 // Create a new TodoItem if collection is empty,
                 // which means you can't delete all TodoItems.
-                _context.Gerentes.Add(new Gerente {Funcionario = new Funcionario{Nome = "Gerente", Cpf = "1",Sexo = "M", Turno = "Manhã,Tarde,Noite", Salario =  5000.00}});
+                var gerente = new Gerente {Funcionario = new Funcionario{Nome = "Gerente", Cpf = "1",Sexo = "M", Turno = "Manhã,Tarde,Noite", Salario =  5000.00}};
+                _context.Gerentes.Add(gerente);
                 _context.SaveChanges();
             }
         }
 
+    //SSL
     // GET: 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Gerente>>> GetGerentes()
+    public async Task<ActionResult<IEnumerable<Object>>> GetGerentes()
     {
-        return await _context.Gerentes.ToListAsync();
+        var gerenteList = await _context.Gerentes.ToListAsync();
+        Object[] newGerenteList = new Object[gerenteList.Count];
+        int i = 0;
+        foreach(var gerente in gerenteList){
+            var funcionario = await _context.Funcionarios.FindAsync(gerente.FuncionarioId);
+            var json = new{
+                id = gerente.Id,
+                funcionario =  funcionario
+            };
+            System.Diagnostics.Debug.WriteLine(json);
+            newGerenteList[i] = json;
+            i++;
+        }
+       
+        return  newGerenteList.ToList();
     }
 
     // GET with id: 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Gerente>> GetGerentes(int id)
+    public async Task<ActionResult<Object>> GetGerentes(int id)
     {
         var gerente = await _context.Gerentes.FindAsync(id);
-
+        var funcionario = await _context.Funcionarios.FindAsync(gerente.FuncionarioId);
         if (gerente == null)
         {
             return NotFound();
         }
-
-        return gerente;
+        var gerenteFormatado = new {
+            id = gerente.Id,
+            funcionario = funcionario
+        };
+        return gerenteFormatado;
     }
 
     // POST: 
@@ -53,7 +73,7 @@ namespace MercadoApi.Controllers
     {
         _context.Gerentes.Add(item);
         await _context.SaveChangesAsync();
-
+        
         return CreatedAtAction(nameof(GetGerentes), new { id = item.Id }, item);
     }
 

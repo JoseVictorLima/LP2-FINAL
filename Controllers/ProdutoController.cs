@@ -37,14 +37,14 @@ namespace MercadoApi.Controllers
     [HttpGet("{id}")]
     public async Task<ActionResult<Produto>> GetProdutos(int id)
     {
-        var gerente = await _context.Produtos.FindAsync(id);
+        var produto = await _context.Produtos.FindAsync(id);
 
-        if (gerente == null)
+        if (produto == null)
         {
             return NotFound();
         }
 
-        return gerente;
+        return produto;
     }
 
     // POST: 
@@ -76,14 +76,14 @@ namespace MercadoApi.Controllers
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteTodoItem(int id)
     {
-        var gerente = await _context.Produtos.FindAsync(id);
+        var produto = await _context.Produtos.FindAsync(id);
 
-        if (gerente == null)
+        if (produto == null)
         {
             return NotFound();
         }
 
-        _context.Produtos.Remove(gerente);
+        _context.Produtos.Remove(produto);
         await _context.SaveChangesAsync();
 
         return NoContent();
