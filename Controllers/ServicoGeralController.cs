@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -28,23 +29,40 @@ namespace MercadoApi.Controllers
 
     // GET: 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ServicosGerais>>> GetServicosGerais()
+    public async Task<ActionResult<IEnumerable<Object>>> GetServicosGerais()
     {
-        return await _context.ServicosGerais.ToListAsync();
+        var servicoGeralList = await _context.ServicosGerais.ToListAsync();
+        Object[] newServicoGeralList = new Object[servicoGeralList.Count];
+        int i = 0;
+        foreach(var servicoGeral in servicoGeralList){
+            var funcionario = await _context.Funcionarios.FindAsync(servicoGeral.FuncionarioId);
+            var json = new{
+                id = servicoGeral.Id,
+                funcionario =  funcionario
+            };
+            System.Diagnostics.Debug.WriteLine(json);
+            newServicoGeralList[i] = json;
+            i++;
+        }
+       
+        return  newServicoGeralList.ToList();
     }
 
     // GET with id: 
     [HttpGet("{id}")]
-    public async Task<ActionResult<ServicosGerais>> GetServicosGerais(int id)
+    public async Task<ActionResult<Object>> GetServicosGerais(int id)
     {
-        var gerente = await _context.ServicosGerais.FindAsync(id);
-
-        if (gerente == null)
+        var servicoGeral = await _context.ServicosGerais.FindAsync(id);
+        var funcionario = await _context.Funcionarios.FindAsync(servicoGeral.FuncionarioId);
+        if (servicoGeral == null)
         {
             return NotFound();
         }
-
-        return gerente;
+        var servicoGeralFormatado = new {
+            id = servicoGeral.Id,
+            funcionario = funcionario
+        };
+        return servicoGeralFormatado;
     }
 
     // POST: 
@@ -76,14 +94,14 @@ namespace MercadoApi.Controllers
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteTodoItem(int id)
     {
-        var gerente = await _context.ServicosGerais.FindAsync(id);
+        var servicoGeral = await _context.ServicosGerais.FindAsync(id);
 
-        if (gerente == null)
+        if (servicoGeral == null)
         {
             return NotFound();
         }
 
-        _context.ServicosGerais.Remove(gerente);
+        _context.ServicosGerais.Remove(servicoGeral);
         await _context.SaveChangesAsync();
 
         return NoContent();
