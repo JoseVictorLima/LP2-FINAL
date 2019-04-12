@@ -20,8 +20,6 @@ namespace MercadoApi.Controllers
             
             if (_context.ServicosGerais.Count() == 0)
             {
-                // Create a new TodoItem if collection is empty,
-                // which means you can't delete all TodoItems.
                 _context.ServicosGerais.Add(new ServicosGerais {Funcionario = new Funcionario{Nome = "ServicosGerais", Cpf = "3",Sexo = "M", Turno = "Tarde", Salario =  1500.50}});
                 _context.SaveChanges();
             }
