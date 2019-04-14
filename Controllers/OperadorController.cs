@@ -17,47 +17,27 @@ namespace MercadoApi.Controllers
         public OperadorController(Context context)
         {
             _context = context;
-            
-            if (_context.Operadores.Count() == 0)
-            {
-                // Create a new TodoItem if collection is empty,
-                // which means you can't delete all TodoItems.
-                _context.Operadores.Add(new Operador {Funcionario = new Funcionario{Nome = "Operador", Cpf = "2",Sexo = "M", Turno = "Manhã,Tarde", Salario =  1500.50}});
-                _context.SaveChanges();
-            }
         }
 
     // GET: 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Object>>> GetOperadores()
     {
-        var operadorList = await _context.Operadores.ToListAsync();
-        Object[] newOperadorList = new Object[operadorList.Count];
-        int i = 0;
-        foreach(var operador in operadorList){
-            var funcionario = await _context.Funcionarios.FindAsync(operador.FuncionarioId);
-            var json = new{
-                id = operador.Id,
-                funcionario =  funcionario
-            };
-            System.Diagnostics.Debug.WriteLine(json);
-            newOperadorList[i] = json;
-            i++;
-        }
+        var operadorList = await _context.Operadores.Include(operador => operador.Funcionario).ToListAsync();
        
-        return  newOperadorList.ToList();
+        return  operadorList;
     }
 
     // GET with id: 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Object>> GetOperadores(int id)
+    public async Task<ActionResult<Object>> GetOperador(int id)
     {
         var operador = await _context.Operadores.FindAsync(id);
-        var funcionario = await _context.Funcionarios.FindAsync(operador.FuncionarioId);
         if (operador == null)
         {
             return NotFound();
         }
+        var funcionario = await _context.Funcionarios.FindAsync(operador.FuncionarioId);
         var operadorFormatado = new {
             id = operador.Id,
             funcionario = funcionario
@@ -77,13 +57,13 @@ namespace MercadoApi.Controllers
 
     // PUT: 
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutOperadores(long id, Operador item)
+    public async Task<IActionResult> PutOperador(int id, Operador item)
     {
         if (id != item.Id)
         {
             return BadRequest();
         }
-
+        _context.Funcionarios.Update(item.Funcionario);
         _context.Entry(item).State = EntityState.Modified;
         await _context.SaveChangesAsync();
 
@@ -92,7 +72,7 @@ namespace MercadoApi.Controllers
 
     // DELETE with id:
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteTodoItem(int id)
+    public async Task<IActionResult> DeleteOperador(int id)
     {
         var operador = await _context.Operadores.FindAsync(id);
 
@@ -100,7 +80,12 @@ namespace MercadoApi.Controllers
         {
             return NotFound();
         }
-
+        var funcionario = await _context.Funcionarios.FindAsync(operador.FuncionarioId);
+        if (funcionario == null)
+        {
+            return NotFound();
+        }
+        _context.Funcionarios.Remove(funcionario);
         _context.Operadores.Remove(operador);
         await _context.SaveChangesAsync();
 

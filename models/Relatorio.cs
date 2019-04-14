@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+
 namespace MercadoApi.Models
 {
     public class Relatorio

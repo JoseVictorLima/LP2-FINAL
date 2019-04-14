@@ -16,14 +16,6 @@ namespace MercadoApi.Controllers
         public ProdutoController(Context context)
         {
             _context = context;
-            
-            if (_context.Produtos.Count() == 0)
-            {
-                // Create a new TodoItem if collection is empty,
-                // which means you can't delete all TodoItems.
-                _context.Produtos.Add(new Produto {Codigo = "1",Nome = "Produto",Preco = 10.00,Quantidade = 1,Peso = 1.00});
-                _context.SaveChanges();
-            }
         }
 
     // GET: 
@@ -35,7 +27,7 @@ namespace MercadoApi.Controllers
 
     // GET with id: 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Produto>> GetProdutos(int id)
+    public async Task<ActionResult<Produto>> GetProduto(int id)
     {
         var produto = await _context.Produtos.FindAsync(id);
 
@@ -51,21 +43,54 @@ namespace MercadoApi.Controllers
     [HttpPost]
     public async Task<ActionResult<Produto>> PostProdutos(Produto item)
     {
+        if(item.Estoque == null){
+
         _context.Produtos.Add(item);
         await _context.SaveChangesAsync();
-
         return CreatedAtAction(nameof(GetProdutos), new { id = item.Id }, item);
+
+        }else{
+
+            var estoque = await _context.Estoques.FindAsync(item.Estoque.Id);
+
+            if(estoque == null){
+                return BadRequest();
+            }
+            var produto = new Produto(){
+                Codigo = item.Codigo,
+                Nome = item.Nome,
+                Preco = item.Preco,
+                Quantidade = item.Quantidade,
+                Peso = item.Peso,
+                Desconto = item.Desconto,
+                Categoria = item.Categoria,
+                Validade = item.Validade,
+                EstoqueId = estoque.Id
+             };
+            _context.Produtos.Add(produto);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetProdutos), new { id = produto.Id }, produto);
+        }
     }
 
     // PUT: 
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutProdutos(long id, Produto item)
+    public async Task<IActionResult> PutProduto(int id, Produto item)
     {
         if (id != item.Id)
         {
             return BadRequest();
         }
 
+        if(item.Estoque != null){
+            var estoque = await _context.Estoques.FindAsync(item.Estoque.Id);
+            item.EstoqueId = estoque.Id;
+        }
+        else{
+            var produto = await _context.Produtos.FindAsync(item.Id);
+            item.EstoqueId = produto.EstoqueId;
+            _context.Entry(produto).State = EntityState.Detached;
+        }
         _context.Entry(item).State = EntityState.Modified;
         await _context.SaveChangesAsync();
 
@@ -74,7 +99,7 @@ namespace MercadoApi.Controllers
 
     // DELETE with id:
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteTodoItem(int id)
+    public async Task<IActionResult> DeleteProduto(int id)
     {
         var produto = await _context.Produtos.FindAsync(id);
 

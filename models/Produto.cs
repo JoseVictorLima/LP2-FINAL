@@ -11,6 +11,8 @@ namespace MercadoApi.Models
         public int Desconto{get;set;}
         public string Categoria{get;set;}
         public int Validade{get;set;}
+        public int? EstoqueId{get;set;}
+        public virtual Estoque Estoque{get;set;}
 
     }
 }

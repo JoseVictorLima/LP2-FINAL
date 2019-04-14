@@ -17,12 +17,6 @@ namespace MercadoApi.Controllers
         public RelatorioController(Context context)
         {
             _context = context;
-            
-            if (_context.Relatorios.Count() == 0)
-            {
-                _context.Relatorios.Add(new Relatorio{Dado="laslas",Funcionario = new Funcionario {Nome = "ServicosGerais", Cpf = "3",Sexo = "M", Turno = "Tarde", Salario =  1500.50}});
-                _context.SaveChanges();
-            }
         }
 
     // GET: 
@@ -32,13 +26,14 @@ namespace MercadoApi.Controllers
         var relatoriosList = await _context.Relatorios.ToListAsync();
         Object[] newRelatoriosList = new Object[relatoriosList.Count];
         int i = 0;
-        foreach(var relatorio in relatoriosList){
-           var funcionario = await _context.Relatorios.FindAsync(relatorio.FuncionarioId);
+        foreach(var relatorio in relatoriosList)
+        {
+           var funcionario = await _context.Funcionarios.FindAsync(relatorio.FuncionarioId);
             var json = new{
                 id = relatorio.Id,
+                dado = relatorio.Dado,
                 funcionario =  funcionario
             };
-            System.Diagnostics.Debug.WriteLine(json);
             newRelatoriosList[i] = json;
             i++;
         }
@@ -58,6 +53,7 @@ namespace MercadoApi.Controllers
         }
         var relatorioFormatado = new {
             id = relatorio.Id,
+            dado = relatorio.Dado,
             funcionario = funcionario
         };
         return relatorioFormatado;
@@ -67,6 +63,18 @@ namespace MercadoApi.Controllers
     [HttpPost]
     public async Task<ActionResult<Relatorio>> PostRelatorios(Relatorio item)
     {
+        if(item.Funcionario !=null)
+        {
+            var funcionario = await _context.Funcionarios.FindAsync(item.Funcionario.Id);
+            if(funcionario == null)
+            {
+                return BadRequest();
+            }
+            item.Funcionario = funcionario;
+            _context.Entry(funcionario).State = EntityState.Detached;
+            _context.Funcionarios.Update(item.Funcionario);
+        }
+
         _context.Relatorios.Add(item);
         await _context.SaveChangesAsync();
 
@@ -75,17 +83,30 @@ namespace MercadoApi.Controllers
 
     // PUT: 
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutRelatorios(long id, Relatorio item)
+    public async Task<IActionResult> PutRelatorios(int id, Relatorio item)
     {
+        var relatorio = await _context.Relatorios.FindAsync(id);
         if (id != item.Id)
         {
             return BadRequest();
         }
 
+        var funcionario = await _context.Funcionarios.FindAsync(relatorio.FuncionarioId);
+        if(funcionario == null)
+        {
+            return BadRequest();
+        }
+
+        item.Funcionario = funcionario;
+        _context.Entry(relatorio).State = EntityState.Detached;
+        _context.Entry(funcionario).State = EntityState.Detached;
+        _context.Funcionarios.Update(item.Funcionario);
         _context.Entry(item).State = EntityState.Modified;
         await _context.SaveChangesAsync();
-
         return NoContent();
+
+
+
     }
 
     // DELETE with id:

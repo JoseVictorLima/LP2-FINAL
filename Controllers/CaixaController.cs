@@ -16,14 +16,6 @@ namespace MercadoApi.Controllers
         public CaixaController(Context context)
         {
             _context = context;
-            
-            if (_context.Caixas.Count() == 0)
-            {
-                // Create a new TodoItem if collection is empty,
-                // which means you can't delete all TodoItems.
-                _context.Caixas.Add(new Caixa {Dinheiro = 100.00,DadosDeVenda = "PRODUTO 1;CLIENTE JOÃO; QUANTIDADE 1"});
-                _context.SaveChanges();
-            }
         }
 
     // GET: 
@@ -35,7 +27,7 @@ namespace MercadoApi.Controllers
 
     // GET with id: 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Caixa>> GetCaixas(int id)
+    public async Task<ActionResult<Caixa>> GetCaixa(int id)
     {
         var caixa = await _context.Caixas.FindAsync(id);
 
@@ -59,7 +51,7 @@ namespace MercadoApi.Controllers
 
     // PUT: 
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutCaixas(long id, Operador item)
+    public async Task<IActionResult> PutCaixa(int id, Caixa item)
     {
         if (id != item.Id)
         {
@@ -74,7 +66,7 @@ namespace MercadoApi.Controllers
 
     // DELETE with id:
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteTodoItem(int id)
+    public async Task<IActionResult> DeleteCaixa(int id)
     {
         var caixa = await _context.Caixas.FindAsync(id);
 

@@ -17,45 +17,27 @@ namespace MercadoApi.Controllers
         public ServicoGeralController(Context context)
         {
             _context = context;
-            
-            if (_context.ServicosGerais.Count() == 0)
-            {
-                _context.ServicosGerais.Add(new ServicosGerais {Funcionario = new Funcionario{Nome = "ServicosGerais", Cpf = "3",Sexo = "M", Turno = "Tarde", Salario =  1500.50}});
-                _context.SaveChanges();
-            }
         }
 
     // GET: 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Object>>> GetServicosGerais()
     {
-        var servicoGeralList = await _context.ServicosGerais.ToListAsync();
-        Object[] newServicoGeralList = new Object[servicoGeralList.Count];
-        int i = 0;
-        foreach(var servicoGeral in servicoGeralList){
-            var funcionario = await _context.Funcionarios.FindAsync(servicoGeral.FuncionarioId);
-            var json = new{
-                id = servicoGeral.Id,
-                funcionario =  funcionario
-            };
-            System.Diagnostics.Debug.WriteLine(json);
-            newServicoGeralList[i] = json;
-            i++;
-        }
+        var servicoGeralList = await _context.ServicosGerais.Include(servicoGeral => servicoGeral.Funcionario).ToListAsync();
        
-        return  newServicoGeralList.ToList();
+        return  servicoGeralList;
     }
 
     // GET with id: 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Object>> GetServicosGerais(int id)
+    public async Task<ActionResult<Object>> GetServicoGeral(int id)
     {
         var servicoGeral = await _context.ServicosGerais.FindAsync(id);
-        var funcionario = await _context.Funcionarios.FindAsync(servicoGeral.FuncionarioId);
         if (servicoGeral == null)
         {
             return NotFound();
         }
+        var funcionario = await _context.Funcionarios.FindAsync(servicoGeral.FuncionarioId);
         var servicoGeralFormatado = new {
             id = servicoGeral.Id,
             funcionario = funcionario
@@ -75,13 +57,13 @@ namespace MercadoApi.Controllers
 
     // PUT: 
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutServicosGerais(long id, ServicosGerais item)
+    public async Task<IActionResult> PutServicoGeral(int id, ServicosGerais item)
     {
         if (id != item.Id)
         {
             return BadRequest();
         }
-
+        _context.Funcionarios.Update(item.Funcionario);
         _context.Entry(item).State = EntityState.Modified;
         await _context.SaveChangesAsync();
 
@@ -98,7 +80,12 @@ namespace MercadoApi.Controllers
         {
             return NotFound();
         }
-
+        var funcionario = await _context.Funcionarios.FindAsync(servicoGeral.FuncionarioId);
+        if (funcionario == null)
+        {
+            return NotFound();
+        }
+        _context.Funcionarios.Remove(funcionario);
         _context.ServicosGerais.Remove(servicoGeral);
         await _context.SaveChangesAsync();
 

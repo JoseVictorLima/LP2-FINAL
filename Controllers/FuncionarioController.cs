@@ -19,9 +19,6 @@ namespace MercadoApi.Controllers
             
             if (_context.Funcionarios.Count() == 0)
             {
-                // Create a new TodoItem if collection is empty,
-                // which means you can't delete all TodoItems.
-                _context.Funcionarios.Add(new Funcionario { Nome = "Victor", Cpf = "12345",Sexo = "M", Turno = "Tarde", Salario =  10.50});
                 _context.SaveChanges();
             }
         }
@@ -35,7 +32,7 @@ namespace MercadoApi.Controllers
 
     // GET with id: 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Funcionario>> GetFuncionarios(int id)
+    public async Task<ActionResult<Funcionario>> GetFuncionario(int id)
     {
         var funcionario = await _context.Funcionarios.FindAsync(id);
 
@@ -59,7 +56,7 @@ namespace MercadoApi.Controllers
 
     // PUT: 
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutFuncionarios(long id, Funcionario item)
+    public async Task<IActionResult> PutFuncionario(int id, Funcionario item)
     {
         if (id != item.Id)
         {
@@ -71,10 +68,9 @@ namespace MercadoApi.Controllers
 
         return NoContent();
     }
-
     // DELETE with id:
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteTodoItem(int id)
+    public async Task<IActionResult> DeleteFuncionario(int id)
     {
         var funcionario = await _context.Funcionarios.FindAsync(id);
 
