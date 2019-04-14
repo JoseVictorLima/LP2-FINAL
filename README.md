@@ -5,6 +5,6 @@ Necessario ter Sqlite 3
 
 Comandos para rodar:
 
-dotnet ef migrations add CreateDatabase
-dotnet ef database update
-dotnet run
+dotnet ef migrations add CreateDatabase,
+dotnet ef database update,
+dotnet run,
